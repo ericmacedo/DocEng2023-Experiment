@@ -45,6 +45,9 @@ content_fields = args.content
 # ============================================================================
 #   Setup
 # ============================================================================
+data_path = Path(f"./data/{dataset}").resolve()
+data_path.mkdir(parents=True, exist_ok=True)
+
 log_path = Path(f"./data/{dataset}/report.log").resolve()
 
 if log_path.exists():
@@ -71,9 +74,6 @@ data = Data(data=df,
 #   Execute experiment
 # ============================================================================
 repeat = args.sample_size
-
-data_path = f"./data/{data.name}"
-Path(data_path).mkdir(parents=True, exist_ok=True)
 
 print_header(f"Running experiment on dataset {data.name} with {repeat} observations")
 
@@ -155,7 +155,7 @@ with yaspin(text="Clustering", color="cyan") as sp:
                     f"{word_model_cfg['name']}", f"{metric.value}"
                 ][f"{doc_model_cfg['name']}"] = report.get(metric=metric)
 
-            report.save(folder=data_path)
+            report.save(folder=f"{data_path}")
 
             del report, doc_model
         
