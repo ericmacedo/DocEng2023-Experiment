@@ -1,4 +1,3 @@
-from _typeshed import StrPath
 from nltk.corpus import stopwords, wordnet
 from nltk import pos_tag, word_tokenize
 from nltk.stem import WordNetLemmatizer
