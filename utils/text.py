@@ -27,7 +27,7 @@ def process_text(data: str, **kwargs) -> str:
     stop_words = kwargs.get("stop_words", [])
     deep = kwargs.get("deep", False)
 
-    stopwords_path = Path('./stopwords.txt').resolve()
+    stopwords_path = Path('./utils/stopwords.txt').resolve()
     with open(stopwords_path, 'r') as f:
         stop_words_file = [line.strip() for line in f]
 
