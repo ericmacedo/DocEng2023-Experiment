@@ -13,11 +13,11 @@ def batch_processing(fn: Callable, data: list, **kwargs) -> list:
         delayed(fn)(data=i, **kwargs) for i in data)
 
 def sysout_it(s: str, level: int = 1):
-    sys.stdout.write(f"{'\t' * level}{s}")
+    sys.stdout.write("{0}{1}".format("\t" * level, s))
 
 def print_header(title: str, cols: int = 80):
     sys.stdout.write(f"{'=' * cols}")
-    sys.stdout.write(f"#\t{title.capitalize()}")
+    sys.stdout.write("#\t{}".format(title.capitalize()))
     sys.stdout.write(f"{'=' * cols}")
 
 

@@ -51,6 +51,18 @@ class Data:
                                               data=[*self.content])
             sp.ok("✔ Corpus processed successfully")
 
+    def save(self):
+        df = pd.DataFrame({
+            "index": self.ids,
+            "content": self.content,
+            "processed": self.processed,
+            "labels": self.labels})
+
+        df.to_csv(path_or_buf=f"../data/{self.name}/data.csv",
+                  encoding="utf-8")
+
+        del df
+
 
 class BagOfWords:
     def train(self, corpus: Iterable[str],
