@@ -24,7 +24,7 @@ def print_header(title: str, cols: int = 80):
 def load_model(dataset: str, model_type: ModelType, name: str):
     spec = spec_from_file_location(
         name,
-        f"./data/{dataset}/{model_type.value}/{name}.py")
+        f"./models/{model_type.value}/{name}.py")
     module = module_from_spec(spec)
     spec.loader.exec_module(module)
     return module
