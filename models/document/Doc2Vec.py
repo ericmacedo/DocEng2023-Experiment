@@ -1,13 +1,12 @@
-import numpy as np
-from pathlib import Path
-from sklearn.utils import shuffle
-from sklearn.cluster import KMeans
-from multiprocessing import cpu_count
-from typing import List, Iterable, Dict
-from models.document import infer_doc2vec
-from os.path import basename, splitext, isfile
-from gensim.models.doc2vec import Doc2Vec, TaggedDocument
 from utils import calculateSample, l2_norm, batch_processing
+from gensim.models.doc2vec import Doc2Vec, TaggedDocument
+from os.path import basename, splitext, isfile
+from typing import List, Iterable, Dict
+from multiprocessing import cpu_count
+from sklearn.cluster import KMeans
+from sklearn.utils import shuffle
+from pathlib import Path
+import numpy as np
 
 
 name = splitext(basename(__file__))[0]

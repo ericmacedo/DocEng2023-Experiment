@@ -1,12 +1,12 @@
-import numpy as np
-from pathlib import Path
-from typing import Iterable
+from os.path import basename, splitext, isfile
+from multiprocessing import cpu_count
+from gensim.models import FastText
+from sklearn.cluster import KMeans
 from utils import calculateSample
 from sklearn.utils import shuffle
-from sklearn.cluster import KMeans
-from gensim.models import FastText
-from multiprocessing import cpu_count
-from os.path import basename, splitext, isfile
+from typing import Iterable
+from pathlib import Path
+import numpy as np
 
 name = splitext(basename(__file__))[0]
 

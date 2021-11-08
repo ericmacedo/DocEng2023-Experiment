@@ -1,10 +1,10 @@
-import numpy as np
-from pathlib import Path
-from models import BagOfWords
-from sklearn.cluster import KMeans
-from typing import Iterable, List, Dict
-from scipy.spatial.distance import cosine
 from os.path import basename, splitext, isfile
+from scipy.spatial.distance import cosine
+from typing import Iterable, List, Dict
+from sklearn.cluster import KMeans
+from models import BagOfWords
+from pathlib import Path
+import numpy as np
 
 name = splitext(basename(__file__))[0]
 
