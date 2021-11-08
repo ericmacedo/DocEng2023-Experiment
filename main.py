@@ -11,7 +11,7 @@ from models import Data
 import pandas as pd
 import argparse
 import sys
-import os
+
 
 # ============================================================================
 #   Arguments
@@ -89,11 +89,16 @@ with yaspin(text="Training", color="cyan") as sp:
         
         model = load_model(**model_cfg)
         for id in range(1, repeat):
-            model.train_model(id=id, dataset=data.name, corpus=data.processed)
+            if id > 1 and model_cfg["name"] == "BagOfWords":
+                model.save_model(id=id,
+                                 dataset=data.name,
+                                 model=model.load_model(dataset=dataset, id=1))
+            else:
+                model.train_model(id=id, dataset=data.name, corpus=data.processed)
 
         del model
 
-    sp.ok("Finished training models!")
+    sp.ok("✔")
 
 
 with yaspin(text="Clustering", color="cyan") as sp:
@@ -166,5 +171,7 @@ with yaspin(text="Clustering", color="cyan") as sp:
     print(tabulate(report_df))
 
     del report_df
-    sp.ok("Finished successfully!.. Exiting.")
+    sp.ok("✔")
+    
+    print("Finished successfully!.. Exiting.")
     sys.exit(0)

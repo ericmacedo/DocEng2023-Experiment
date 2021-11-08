@@ -47,10 +47,10 @@ class Data:
         self.n = len(data)
         self.k = len(np.unique(self.labels))
 
-        with yaspin(text="Processing corpus...", color="cyan") as sp:
+        with yaspin(text="Processing corpus", color="cyan") as sp:
             self.processed = batch_processing(fn=process_text, deep=True,
                                               data=[*self.content])
-            sp.ok("✔ Corpus processed successfully")
+            sp.ok("✔")
         
         self.save()
 
