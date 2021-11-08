@@ -51,6 +51,8 @@ class Data:
             self.processed = batch_processing(fn=process_text, deep=True,
                                               data=[*self.content])
             sp.ok("✔ Corpus processed successfully")
+        
+        self.save()
 
     def save(self):
         df = pd.DataFrame({
