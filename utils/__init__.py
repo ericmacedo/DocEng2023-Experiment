@@ -16,9 +16,9 @@ def sysout_it(s: str, level: int = 1):
     sys.stdout.write("{0}{1}".format("\t" * level, s))
 
 def print_header(title: str, cols: int = 80):
-    sys.stdout.write(f"{'=' * cols}")
+    sys.stdout.write("{}\n".format("=" * cols))
     sys.stdout.write("#\t{}".format(title.capitalize()))
-    sys.stdout.write(f"{'=' * cols}")
+    sys.stdout.write("{}\n".format("=" * cols))
 
 
 def load_model(dataset: str, model_type: ModelType, name: str):
