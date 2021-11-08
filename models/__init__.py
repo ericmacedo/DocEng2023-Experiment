@@ -61,7 +61,7 @@ class Data:
             "processed": self.processed,
             "labels": self.labels})
 
-        df.to_csv(path_or_buf=f"../data/{self.name}/data.csv",
+        df.to_csv(path_or_buf=f"./data/{self.name}/data.csv",
                   encoding="utf-8")
 
         del df
