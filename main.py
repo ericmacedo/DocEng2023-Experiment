@@ -11,6 +11,7 @@ from models import Data
 import pandas as pd
 import argparse
 import sys
+import os
 
 # ============================================================================
 #   Arguments
@@ -44,7 +45,14 @@ content_fields = args.content
 # ============================================================================
 #   Setup
 # ============================================================================
-sys.out = Logger(f"./data/{dataset}/report.log")
+log_path = Path(f"./data/{dataset}/report.log").resolve()
+
+if log_path.exists():
+    log_path.unlink()
+
+log_path.touch()
+
+sys.out = Logger(str(log_path))
 
 # ============================================================================
 #   Collect and process data
