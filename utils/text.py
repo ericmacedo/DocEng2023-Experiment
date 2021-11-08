@@ -1,7 +1,9 @@
+from _typeshed import StrPath
 from nltk.corpus import stopwords, wordnet
 from nltk import pos_tag, word_tokenize
 from nltk.stem import WordNetLemmatizer
 from functools import lru_cache
+from pathlib import Path
 import string
 import re
 
@@ -26,7 +28,8 @@ def process_text(data: str, **kwargs) -> str:
     stop_words = kwargs.get("stop_words", [])
     deep = kwargs.get("deep", False)
 
-    with open('./stopwords.txt', 'r') as f:
+    stopwords_path = Path('./stopwords.txt').resolve()
+    with open(stopwords_path, 'r') as f:
         stop_words_file = [line.strip() for line in f]
 
     punctuation = r"[{0}]".format(re.sub(r"[-']", "", string.punctuation))
