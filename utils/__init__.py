@@ -17,7 +17,7 @@ def sysout_it(s: str, level: int = 1):
 
 def print_header(title: str, cols: int = 80):
     sys.stdout.write("{}\n".format("=" * cols))
-    sys.stdout.write("#\t{}".format(title.capitalize()))
+    sys.stdout.write("#\t{}\n".format(title.capitalize()))
     sys.stdout.write("{}\n".format("=" * cols))
 
 

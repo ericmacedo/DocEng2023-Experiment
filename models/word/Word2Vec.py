@@ -13,7 +13,7 @@ name = splitext(basename(__file__))[0]
 
 def model_path(dataset: str, id: int) -> str:
     return str(Path(
-        f"./data/{dataset}/word/{name}/{id}.bin"
+        f"./data/{dataset}/word/{name}/{id:03}.bin"
     ).resolve())
 
 
