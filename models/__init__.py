@@ -1,9 +1,7 @@
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.preprocessing import LabelEncoder
-from typing import List, Iterable
-from utils.text import process_text
-from utils import batch_processing
 from dataclasses import dataclass
+from typing import List, Iterable
 from typing import List, Any
 from yaspin import yaspin
 from enum import Enum
@@ -39,6 +37,9 @@ class Data:
                        id_field: str,
                        content_fields: List[str],
                        label_field: str):
+        from utils.text import process_text
+        from utils import batch_processing
+
         self.name = name
         self.ids = data[id_field].tolist()
         self.content = data[content_fields].agg("\n".join, axis=1).tolist()
