@@ -53,7 +53,7 @@ id_field = args.id
 label_field = args.label
 content_fields = args.content
 
-train_models = args.get("train_models", "all")
+train_models = args.train_models
 if train_models == "all":
     train_models = [m['name'] for m in models]
 
