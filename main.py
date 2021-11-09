@@ -95,7 +95,7 @@ print_header(f"Running experiment on dataset {data.name} with {repeat} observati
 with yaspin(color="cyan") as sp:
     print("Training models".upper())
     for model_cfg in models:
-        if not model_cfg['model_type'].value in train_models:
+        if not model_cfg['name'] in train_models:
             continue
         Path(
             f"{data_path}/{model_cfg['model_type'].value}/{model_cfg['name']}"
@@ -121,8 +121,10 @@ with yaspin(color="cyan") as sp:
 
 with yaspin(text="Clustering", color="cyan") as sp:
     print("Clustering models".upper())
-    word_models = filter(models, lambda m: m['model_type'] == ModelType.WORD)
-    doc_models = filter(models, lambda m: m['model_type'] == ModelType.DOCUMENT)
+    word_models = [*filter(
+        lambda m: m['model_type'] == ModelType.WORD, models)]
+    doc_models = [*filter(
+        lambda m: m['model_type'] == ModelType.DOCUMENT, models)]
 
     metrics_list = [m.value for m in Metrics]
 
