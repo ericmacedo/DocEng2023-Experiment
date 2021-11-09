@@ -20,15 +20,13 @@ def model_path(dataset: str, id: int) -> str:
 def load_model(dataset: str, id: int) -> FastText:
     path = model_path(dataset=dataset, id=id)
     if isfile(path):
-        model = FastText.load_word2vec_format(fname=path, binary=True)
+        model = FastText.load(fname=path)
         return model
     return None
 
 
 def save_model(dataset: str, id: int, model: FastText):
-    model.save_word2vec_format(
-        fname=model_path(dataset=dataset, id=id),
-        binary=True)
+    model.save(model_path(dataset=dataset, id=id), separately=[])
 
 
 def train_model(dataset: str, id: int, corpus: Iterable[str]) -> FastText:
