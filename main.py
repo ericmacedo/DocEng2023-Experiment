@@ -12,6 +12,10 @@ import pandas as pd
 import argparse
 import sys
 
+# TODO remove tqdm progress bars
+# TODO make proper logs to file
+# TODO provide feedback for iteration counter
+
 
 # ============================================================================
 #   Arguments
@@ -33,6 +37,11 @@ parser.add_argument("--content", "-c", type=str, nargs="+",
                     required=True, dest="content",
                     help="The column names that contain the document content")
 
+parser.add_argument("--train-models", "-t", type=str, nargs="+",
+                    dest="train_models", default="all",
+                    choices=[m['model_type'].value for m in models] + ["all"],
+                    help="Name of the models to train (default 'all'))")
+
 args = parser.parse_args()
 
 dataset = args.name
@@ -41,6 +50,10 @@ path = args.path
 id_field = args.id
 label_field = args.label
 content_fields = args.content
+
+train_models = args.get("train_models", "all")
+if train_models == "all":
+    train_models = [m['model_type'].value for m in models]
 
 # ============================================================================
 #   Setup
@@ -80,6 +93,8 @@ print_header(f"Running experiment on dataset {data.name} with {repeat} observati
 with yaspin(text="Training", color="cyan") as sp:
     sys.stdout.write("Training models".upper())
     for model_cfg in models:
+        if not model_cfg['model_type'].value in train_models:
+            continue
         Path(
             f"{data_path}/{model_cfg['model_type'].value}/{model_cfg['name']}"
         ).mkdir(parents=True, exist_ok=True)
