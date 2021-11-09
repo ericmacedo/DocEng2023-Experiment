@@ -9,6 +9,25 @@ from time import time
 import numpy as np
 import sys
 
+class Logger(object):
+    def __init__(self, path: str):
+        self.terminal = sys.stdout
+        self.file = open(path, "w")
+
+        self.outputs = [self.terminal, self.file]
+   
+    def write(self, message: str):
+        for output in self.outputs:
+            output.write(message)
+            output.flush()
+
+    def flush(self):
+        for output in self.outputs:
+            output.flush()
+
+    def __del__(self):
+        self.file.close()
+
 def batch_processing(fn: Callable, data: list, **kwargs) -> list:
     return Parallel(n_jobs=-1, backend="multiprocessing")(
         delayed(fn)(data=i, **kwargs) for i in data)
@@ -39,21 +58,6 @@ def timing(fn: Callable):
         t = time()
         return (result, t - t0)
     return wrap
-
-class Logger(object):
-    def __init__(self, path: str):
-        self.terminal = sys.stdout
-        self.log = open(path, "a")
-   
-    def write(self, message: str):
-        self.terminal.write(message)
-        self.log.write(message)  
-
-    def flush(self):
-        # this flush method is needed for python 3 compatibility.
-        # this handles the flush command by doing nothing.
-        # you might want to specify some extra behavior here.
-        pass
 
 def l2_norm(data: list) -> np.array:
     data = np.array(data, dtype=float)

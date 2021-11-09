@@ -12,10 +12,12 @@ import pandas as pd
 import argparse
 import sys
 
-# TODO remove tqdm progress bars
-# TODO make proper logs to file
-# TODO provide feedback for iteration counter
+from functools import partialmethod
+from tqdm import tqdm
 
+tqdm.__init__ = partialmethod(tqdm.__init__, disable=True)
+
+# TODO make proper logs to file
 
 # ============================================================================
 #   Arguments
@@ -90,8 +92,8 @@ repeat = args.sample_size
 
 print_header(f"Running experiment on dataset {data.name} with {repeat} observations")
 
-with yaspin(text="Training", color="cyan") as sp:
-    sys.stdout.write("Training models".upper())
+with yaspin(color="cyan") as sp:
+    print("Training models".upper())
     for model_cfg in models:
         if not model_cfg['model_type'].value in train_models:
             continue
@@ -104,6 +106,7 @@ with yaspin(text="Training", color="cyan") as sp:
         
         model = load_model(**model_cfg)
         for id in range(1, repeat):
+            sp.text = f"Training model {id}"
             if id > 1 and model_cfg["name"] == "BagOfWords":
                 model.save_model(id=id,
                                  dataset=data.name,
@@ -117,7 +120,7 @@ with yaspin(text="Training", color="cyan") as sp:
 
 
 with yaspin(text="Clustering", color="cyan") as sp:
-    sys.stdout.write("Clustering models".upper())
+    print("Clustering models".upper())
     word_models = filter(models, lambda m: m['model_type'] == ModelType.WORD)
     doc_models = filter(models, lambda m: m['model_type'] == ModelType.DOCUMENT)
 
@@ -148,6 +151,7 @@ with yaspin(text="Clustering", color="cyan") as sp:
                                           word_model_cfg['name'],
                                           doc_model_cfg['name']))
             for id in range(1, repeat):
+                sp.text = f"Clustering iteration {id}"
                 word_vectors = word_model.load_model(id=id, dataset=data.name)
                 doc_vectors = doc_model.load_model(id=id, dataset=data.name)
                 embeddings = doc_vectors.get_vectors(id=id,
@@ -185,8 +189,9 @@ with yaspin(text="Clustering", color="cyan") as sp:
                      encoding="utf-8")
     print(tabulate(report_df))
 
-    del report_df
     sp.ok("✔ ")
     
     print("Finished successfully!.. Exiting.")
+
+    del report_df, sys.out
     sys.exit(0)
