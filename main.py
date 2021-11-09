@@ -41,7 +41,7 @@ parser.add_argument("--content", "-c", type=str, nargs="+",
 
 parser.add_argument("--train-models", "-t", type=str, nargs="+",
                     dest="train_models", default="all",
-                    choices=[m['model_type'].value for m in models] + ["all"],
+                    choices=[m['name'] for m in models] + ["all"],
                     help="Name of the models to train (default 'all'))")
 
 args = parser.parse_args()
@@ -55,7 +55,7 @@ content_fields = args.content
 
 train_models = args.get("train_models", "all")
 if train_models == "all":
-    train_models = [m['model_type'].value for m in models]
+    train_models = [m['name'] for m in models]
 
 # ============================================================================
 #   Setup
