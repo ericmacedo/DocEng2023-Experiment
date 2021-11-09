@@ -1,4 +1,5 @@
 from os.path import basename, splitext, isfile
+from gensim.models import KeyedVectors
 from multiprocessing import cpu_count
 from gensim.models import FastText
 from sklearn.cluster import KMeans
@@ -17,16 +18,17 @@ def model_path(dataset: str, id: int) -> str:
     ).resolve())
 
 
-def load_model(dataset: str, id: int) -> FastText:
+def load_model(dataset: str, id: int) -> KeyedVectors:
     path = model_path(dataset=dataset, id=id)
     if isfile(path):
-        model = FastText.load(fname=path)
+        model = KeyedVectors.load_word2vec_format(fname=path, binary=True)
         return model
     return None
 
 
 def save_model(dataset: str, id: int, model: FastText):
-    model.save(model_path(dataset=dataset, id=id), separately=[])
+    model.wv.save_word2vec_format(
+        fname=model_path(dataset=dataset, id=id), binary=True)
 
 
 def train_model(dataset: str, id: int, corpus: Iterable[str]) -> FastText:

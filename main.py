@@ -2,22 +2,18 @@ from models.clustering import Report, Clustering, clusterer
 from utils import load_model, print_header, Logger
 from models.document import DocumentModels
 from models import ModelType, models
+from functools import partialmethod
 from models.metrics import Metrics
 from models.word import WordModels
 from tabulate import tabulate
 from yaspin import yaspin
 from pathlib import Path
 from models import Data
+from tqdm import tqdm
 import pandas as pd
+import warnings
 import argparse
 import sys
-
-from functools import partialmethod
-from tqdm import tqdm
-
-tqdm.__init__ = partialmethod(tqdm.__init__, disable=True)
-
-# TODO make proper logs to file
 
 # ============================================================================
 #   Arguments
@@ -73,6 +69,10 @@ log_path.touch()
 sys.stdout = Logger(str(log_path))
 sys.stdout.isatty = lambda : False
 sys.stdout.encoding = "utf-8"
+
+tqdm.__init__ = partialmethod(tqdm.__init__, disable=True)
+
+warnings.filterwarnings("ignore")
 
 # ============================================================================
 #   Collect and process data
