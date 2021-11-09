@@ -1,6 +1,6 @@
-from multiprocessing import Process, Queue
-from scipy.spatial.distance import cdist
+from sentence_transformers import SentenceTransformer
 from dataclasses import dataclass, field
+from scipy.spatial.distance import cdist
 from typing import List
 from enum import Enum
 import numpy as np
@@ -21,25 +21,12 @@ class Bert:
         self.model_name = model_name
         self.embeddings = []
 
-    def _train(self, queue: Queue, corpus: List[str]):
-        from sentence_transformers import SentenceTransformer
-
+    def train(self, corpus: List[str]) -> list:
         transformer = SentenceTransformer(self.model_name)
-        embeddings = transformer.encode(corpus).tolist()
+        self.embeddings = transformer.encode(corpus).tolist()
 
         del transformer
         Bert.clear_memory()
-
-        queue.put(embeddings)
-
-    def train(self, corpus: List[str]) -> list:
-        queue = Queue()
-        p = Process(
-            target=self._train,
-            kwargs={"queue": queue, "corpus": corpus})
-        p.start()
-        self.embeddings = queue.get()
-        p.join()
 
         return self.embeddings
 
