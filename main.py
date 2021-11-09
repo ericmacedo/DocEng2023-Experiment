@@ -149,7 +149,7 @@ with yaspin(text="Clustering", color="cyan") as sp:
             doc_model_cfg["dataset"] = data.name
             doc_model = load_model(**doc_model_cfg)
 
-            sp.write("> Running clustering algorithm {0} x {1}}".format(
+            sp.write("> Running clustering algorithm {0} x {1}".format(
                 word_model_cfg['name'], doc_model_cfg['name']))
             report = Report(name="_".join(data.name,
                                           word_model_cfg['name'],
