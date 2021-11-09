@@ -6,6 +6,7 @@ from models import ModelType
 from typing import Callable
 from functools import wraps
 from time import time
+import numpy as np
 import sys
 
 def batch_processing(fn: Callable, data: list, **kwargs) -> list:
@@ -52,4 +53,15 @@ class Logger(object):
         # this flush method is needed for python 3 compatibility.
         # this handles the flush command by doing nothing.
         # you might want to specify some extra behavior here.
-        pass    
+        pass
+
+def l2_norm(data: list) -> np.array:
+    data = np.array(data, dtype=float)
+    dist = np.sqrt((data ** 2).sum(-1))[..., np.newaxis]
+    return data / dist
+
+def calculateSample(corpus_size: int) -> float:
+    if corpus_size > 500:
+        return 1e-5
+
+    return 1 * (1.0 / (10 ** int(corpus_size/100)))

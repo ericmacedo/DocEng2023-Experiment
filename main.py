@@ -98,7 +98,7 @@ with yaspin(text="Training", color="cyan") as sp:
 
         del model
 
-    sp.ok("✔")
+    sp.ok("✔ ")
 
 
 with yaspin(text="Clustering", color="cyan") as sp:
@@ -171,7 +171,7 @@ with yaspin(text="Clustering", color="cyan") as sp:
     print(tabulate(report_df))
 
     del report_df
-    sp.ok("✔")
+    sp.ok("✔ ")
     
     print("Finished successfully!.. Exiting.")
     sys.exit(0)

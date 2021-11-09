@@ -50,7 +50,7 @@ class Data:
         with yaspin(text="Processing corpus", color="cyan") as sp:
             self.processed = batch_processing(fn=process_text, deep=True,
                                               data=[*self.content])
-            sp.ok("✔")
+            sp.ok("✔ ")
         
         self.save()
 

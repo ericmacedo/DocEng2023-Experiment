@@ -1,6 +1,7 @@
 from utils import calculateSample, l2_norm, batch_processing
 from gensim.models.doc2vec import Doc2Vec, TaggedDocument
 from os.path import basename, splitext, isfile
+from models.document import infer_doc2vec
 from typing import List, Iterable, Dict
 from multiprocessing import cpu_count
 from sklearn.cluster import KMeans

@@ -64,6 +64,12 @@ class Bert:
                 protocol=pickle.DEFAULT_PROTOCOL,
                 fix_imports=True)
 
+def infer_doc2vec(data: str, **kwargs) -> list:
+    model = kwargs.get("model", None)
+    return model.infer_vector(
+        data.split(" "), steps=35
+    ) if model else None
+
 class BestCMeans:
     def fit_predict(self, data, c, m, error, maxiter, init=None, seed=None):
         """

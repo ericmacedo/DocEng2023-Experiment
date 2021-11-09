@@ -1,9 +1,10 @@
-from utils import process_text, calculateSample, synonyms
 from os.path import basename, splitext, isfile
+from utils.text import process_text, synonyms
 from multiprocessing import cpu_count
 from sklearn.cluster import KMeans
 from gensim.models import Word2Vec
 from sklearn.utils import shuffle
+from utils import calculateSample
 from typing import Iterable
 from pathlib import Path
 import numpy as np
