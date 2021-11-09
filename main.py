@@ -71,6 +71,8 @@ if log_path.exists():
 log_path.touch()
 
 sys.stdout = Logger(str(log_path))
+sys.stdout.isatty = lambda : False
+sys.stdout.encoding = "utf-8"
 
 # ============================================================================
 #   Collect and process data

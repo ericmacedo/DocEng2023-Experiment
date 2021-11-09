@@ -25,7 +25,7 @@ class Logger(object):
         for output in self.outputs:
             output.flush()
 
-    def __del__(self):
+    def __exit__(self):
         self.file.close()
 
 def batch_processing(fn: Callable, data: list, **kwargs) -> list:
