@@ -70,7 +70,7 @@ if log_path.exists():
 
 log_path.touch()
 
-sys.out = Logger(str(log_path))
+sys.stdout = Logger(str(log_path))
 
 # ============================================================================
 #   Collect and process data
