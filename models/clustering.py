@@ -70,16 +70,20 @@ class Report:
     name: str
     samples: List[Clustering] = field(default_factory=list)
 
+    def __init__(self, name: str):
+        self.name = name
+        self.samples = []
+
     def append(self, clustering: Clustering):
         self.samples.append(clustering)
 
     def get(self, metric: Metrics) -> str:
         observations = [
-            sample.metrics.get(metric=metric)
+            sample.metrics.get(metric=metric).measure
             for sample in self.samples]
         return "{mean:.4f} ± {std:.4f}".format(
             mean=mean(observations, axis=0),
-            str=std(observations, axis=0))
+            std=std(observations, axis=0))
 
     def save(self, folder: str):
         with open(f"{folder}/{self.name}.pkl", "wb") as f_pkl:

@@ -20,12 +20,12 @@ import sys
 # ============================================================================
 parser = argparse.ArgumentParser()
 
-parser.add_argument("--name", "-n", type=str, required=True, dest="name",
-                    help="Name of the dataset")
+parser.add_argument("--name", "-n", type=str, dest="name",
+                    help="Name of the dataset", default=None)
 parser.add_argument("--path", "-p", type=str, required=True, dest="path",
                     help="Path to the CSV file")
 parser.add_argument("--sample-size", "-s", type=int, default=100,
-                    dest="sample_size", required=True,
+                    dest="sample_size",
                     help="Number of observations to generate")
 parser.add_argument("--id", "-id", type=str, dest="id",
                     help="The column name that contain the document identifier")
@@ -42,8 +42,11 @@ parser.add_argument("--train-models", "-t", type=str, nargs="+",
 
 args = parser.parse_args()
 
-dataset = args.name
 path = args.path
+
+file_path = Path(path).resolve()
+
+dataset = args.name if args.name else file_path.stem
 
 id_field = args.id
 label_field = args.label
@@ -69,7 +72,7 @@ if log_path.exists():
 log_path.touch()
 
 sys.stdout = Logger(str(log_path))
-sys.stdout.isatty = lambda : False
+sys.stdout.isatty = lambda: False
 sys.stdout.encoding = "utf-8"
 
 tqdm.__init__ = partialmethod(tqdm.__init__, disable=True)
@@ -79,7 +82,8 @@ warnings.filterwarnings("ignore")
 # ============================================================================
 #   Collect and process data
 # ============================================================================
-df = pd.read_csv(filepath_or_buffer=f"{Path(path).resolve()}",
+
+df = pd.read_csv(filepath_or_buffer=f"{file_path}",
                  engine="python", encoding="utf-8",
                  usecols=[] + [id_field] + [label_field] + content_fields)
 
@@ -94,7 +98,8 @@ data = Data(data=df,
 # ============================================================================
 repeat = args.sample_size
 
-print_header(f"Running experiment on dataset {data.name} with {repeat} observations")
+print_header(
+    f"Running experiment on dataset {data.name} with {repeat} observations")
 
 with yaspin(color="cyan") as sp:
     print("Training models".upper())
@@ -105,9 +110,10 @@ with yaspin(color="cyan") as sp:
             f"{data_path}/{model_cfg['model_type'].value}/{model_cfg['name']}"
         ).mkdir(parents=True, exist_ok=True)
         model_cfg["dataset"] = data.name
-        
-        sp.write(f"> Traning {model_cfg['model_type'].value} model {model_cfg['name']}")
-        
+
+        sp.write(
+            f"> Traning {model_cfg['model_type'].value} model {model_cfg['name']}")
+
         model = load_model(**model_cfg)
         for id in range(1, repeat):
             sp.text = f"Training model {id}"
@@ -116,7 +122,8 @@ with yaspin(color="cyan") as sp:
                                  dataset=data.name,
                                  model=model.load_model(dataset=dataset, id=1))
             else:
-                model.train_model(id=id, dataset=data.name, corpus=data.processed)
+                model.train_model(id=id, dataset=data.name,
+                                  corpus=data.processed)
 
         del model
 
@@ -133,7 +140,7 @@ with yaspin(text="Clustering", color="cyan") as sp:
     metrics_list = [m.value for m in Metrics]
 
     pd_index = list(zip(*[
-        [ i for m in WordModels for i in [m.value] * len(metrics_list) ],
+        [i for m in WordModels for i in [m.value] * len(metrics_list)],
         metrics_list * 3
     ]))
 
@@ -142,32 +149,30 @@ with yaspin(text="Clustering", color="cyan") as sp:
     pd_cols = [m.value for m in DocumentModels]
 
     report_df = pd.DataFrame(index=pd_index, columns=pd_cols, dtype=str)
-    
+
     for word_model_cfg in word_models:
         word_model_cfg["dataset"] = data.name
         word_model = load_model(**word_model_cfg)
-        
+
         for doc_model_cfg in doc_models:
             doc_model_cfg["dataset"] = data.name
             doc_model = load_model(**doc_model_cfg)
 
             sp.write("> Running clustering algorithm {0} x {1}".format(
                 word_model_cfg['name'], doc_model_cfg['name']))
-            report = Report(name="_".join(data.name,
+            report = Report(name="_".join([data.name,
                                           word_model_cfg['name'],
-                                          doc_model_cfg['name']))
+                                          doc_model_cfg['name']]))
             for id in range(1, repeat):
                 sp.text = f"Clustering iteration {id}"
-                word_vectors = word_model.load_model(id=id, dataset=data.name)
-                doc_vectors = doc_model.load_model(id=id, dataset=data.name)
-                embeddings = doc_vectors.get_vectors(id=id,
-                                                     dataset=data.name,
-                                                     corpus=data.processed)
+                embeddings = doc_model.get_vectors(id=id,
+                                                   dataset=data.name,
+                                                   data=data.processed)
                 labels_pred, time = clusterer(
-                    dataset=data.name, 
+                    dataset=data.name,
                     id=id,
-                    word_vectors=word_vectors,
-                    doc_vectors=doc_vectors,
+                    word_vectors=word_model,
+                    doc_vectors=doc_model,
                     embeddings=embeddings,
                     k=data.k)
 
@@ -178,17 +183,17 @@ with yaspin(text="Clustering", color="cyan") as sp:
                     labels_true=data.labels,
                     time=time))
 
-                del word_vectors, doc_vectors, embeddings, time, labels_pred
+                del embeddings, time, labels_pred
 
             for metric in Metrics:
-                report_df[
+                report_df.loc[
                     f"{word_model_cfg['name']}", f"{metric.value}"
                 ][f"{doc_model_cfg['name']}"] = report.get(metric=metric)
 
             report.save(folder=f"{data_path}")
 
             del report, doc_model
-        
+
         del word_model
 
     report_df.to_csv(path_or_buf=f"{data_path}/report.csv",
@@ -196,8 +201,8 @@ with yaspin(text="Clustering", color="cyan") as sp:
     print(tabulate(report_df))
 
     sp.ok("✔ ")
-    
+
     print("Finished successfully!.. Exiting.")
 
-    del report_df, sys.out
+    del report_df, sys.stdout
     sys.exit(0)

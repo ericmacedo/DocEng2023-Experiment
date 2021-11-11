@@ -33,13 +33,12 @@ def train_model(dataset: str, id: int, corpus: Iterable[str]):
     save_model(dataset=dataset, id=id, model=model)
 
 
-def get_vectors(dataset: str, id: int, data: Iterable[str]) -> Iterable[Iterable[float]]:
+def get_vectors(dataset: str,
+                id: int,
+                data: Iterable[str]) -> List[List[float]]:
     model = load_model(dataset=dataset, id=id)
 
-    if not model:
-        train_model(dataset=dataset, id=id, corpus=data)
-
-    return model.embeddings
+    return model.predict(data=data) if data else model.embeddings
 
 
 def cluster(dataset: str, id: int,
