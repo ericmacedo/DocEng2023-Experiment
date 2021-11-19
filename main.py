@@ -162,12 +162,8 @@ with yaspin(text="Clustering", color="cyan") as sp:
                 word_model_cfg['name'], doc_model_cfg['name']))
             report = Report(name="_".join([data.name,
                                           word_model_cfg['name'],
-<<<<<<< HEAD
-                                          doc_model_cfg['name']),
+                                          doc_model_cfg['name']]),
                             dataset=data.name)
-=======
-                                          doc_model_cfg['name']]))
->>>>>>> 22ad752ec6f8dd6dd7ca2ecb04c268b1720ed487
             for id in range(1, repeat):
                 sp.text = f"Clustering iteration {id}"
                 embeddings = doc_model.get_vectors(id=id,
