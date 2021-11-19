@@ -4,6 +4,7 @@ from models.metrics import (
 from dataclasses import dataclass, field
 from typing import Sequence, List, Dict
 from numpy import mean, std
+from pathlib import Path
 from utils import timing
 import pickle
 
@@ -43,20 +44,20 @@ class Evaluation:
     
 @dataclass
 class Clustering:
-    name: str
+    id: int
     embeddings: Sequence[Sequence[float]]
     labels_true: List[int]
     labels_pred: List[int]
     metrics: Evaluation
 
     def __init__(self, 
-                 name: str,
+                 id: int,
                  X: Sequence[Sequence[float]],
                  labels_true: List[int],
                  labels_pred: List[int],
                  time: float):
 
-        self.name = name
+        self.id = id
         self.embeddings = X
         self.labels_true = labels_true
         self.labels_pred = labels_pred
@@ -65,21 +66,49 @@ class Clustering:
                                   labels_pred=labels_pred,
                                   time=time)
 
+    def save(self, folder: str):
+        with open(f"{folder}/{self.id:03}.bin", "wb") as pkl_file:
+            pickle.dump(
+                obj=self,
+                file=pkl_file,
+                protocol=pickle.DEFAULT_PROTOCOL,
+                fix_imports=True)
+                
+    @classmethod
+    def load(cls, folder: str, id: int):
+        return pickle.load(open(f"{folder}/{id:03}.bin", "wb"))
+
 
 class Report:
     name: str
-    samples: List[Clustering] = field(default_factory=list)
+    __samples_path: str
+
+    def __init__(self, dataset: str, name: str):
+        self.name = name
+
+        self.__samples_path = f"./data/{dataset}/clustering/{name}"
+        
+        Path(self.__samples_path).resolve().mkdir(parents=True, exist_ok=True)
 
     def append(self, clustering: Clustering):
-        self.samples.append(clustering)
+        clustering.save(folder=self.__samples_path)
+        del clustering
 
     def get(self, metric: Metrics) -> str:
-        observations = [
-            sample.metrics.get(metric=metric)
-            for sample in self.samples]
+        observations = [sample.metrics.get(metric=metric) for sample in self]
         return "{mean:.4f} ± {std:.4f}".format(
             mean=mean(observations, axis=0),
             str=std(observations, axis=0))
+
+    def __getitem__(self, index: int) -> Clustering:
+        if isinstance(index, int):
+            return Clustering.load(folder=self.__samples_path, id=id)
+        else:
+            raise TypeError("Invalid index type")
+
+    def __len__(self) -> int:
+        files = Path(self.__samples_path).glob("*.bin")
+        return len([f for f in files if f.is_file()])
 
     def save(self, folder: str):
         with open(f"{folder}/{self.name}.pkl", "wb") as f_pkl:

@@ -155,7 +155,8 @@ with yaspin(text="Clustering", color="cyan") as sp:
                 word_model_cfg['name'], doc_model_cfg['name']))
             report = Report(name="_".join(data.name,
                                           word_model_cfg['name'],
-                                          doc_model_cfg['name']))
+                                          doc_model_cfg['name']),
+                            dataset=data.name)
             for id in range(1, repeat):
                 sp.text = f"Clustering iteration {id}"
                 word_vectors = word_model.load_model(id=id, dataset=data.name)
@@ -172,7 +173,7 @@ with yaspin(text="Clustering", color="cyan") as sp:
                     k=data.k)
 
                 report.append(Clustering(
-                    name=f"{report.name}_{id}",
+                    id=id,
                     X=embeddings,
                     labels_pred=labels_pred,
                     labels_true=data.labels,
@@ -184,8 +185,6 @@ with yaspin(text="Clustering", color="cyan") as sp:
                 report_df[
                     f"{word_model_cfg['name']}", f"{metric.value}"
                 ][f"{doc_model_cfg['name']}"] = report.get(metric=metric)
-
-            report.save(folder=f"{data_path}")
 
             del report, doc_model
         
