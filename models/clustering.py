@@ -90,15 +90,25 @@ class Report:
         
         Path(self.__samples_path).resolve().mkdir(parents=True, exist_ok=True)
 
+    def __init__(self, name: str):
+        self.name = name
+        self.samples = []
+
     def append(self, clustering: Clustering):
         clustering.save(folder=self.__samples_path)
         del clustering
 
     def get(self, metric: Metrics) -> str:
+<<<<<<< HEAD
         observations = [sample.metrics.get(metric=metric) for sample in self]
+=======
+        observations = [
+            sample.metrics.get(metric=metric).measure
+            for sample in self.samples]
+>>>>>>> 22ad752ec6f8dd6dd7ca2ecb04c268b1720ed487
         return "{mean:.4f} ± {std:.4f}".format(
             mean=mean(observations, axis=0),
-            str=std(observations, axis=0))
+            std=std(observations, axis=0))
 
     def __getitem__(self, index: int) -> Clustering:
         if isinstance(index, int):

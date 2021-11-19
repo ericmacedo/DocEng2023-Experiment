@@ -1,15 +1,16 @@
 from sentence_transformers import SentenceTransformer
 from dataclasses import dataclass, field
 from scipy.spatial.distance import cdist
-from typing import List
+from typing import Iterable, List
 from enum import Enum
 import numpy as np
 import pickle
 
+
 class DocumentModels(Enum):
     BAG_OF_WORDS = "BagOfWords"
-    DOC_2_VEC    = "Doc2Vec"
-    BERT         = "BERT"
+    DOC_2_VEC = "Doc2Vec"
+    BERT = "BERT"
 
 
 @dataclass
@@ -29,6 +30,15 @@ class Bert:
         Bert.clear_memory()
 
         return self.embeddings
+
+    def predict(self, data: Iterable[str]) -> List[List[float]]:
+        transformer = SentenceTransformer(self.model_name)
+        embeddings = transformer.encode(data).tolist()
+
+        del transformer
+        Bert.clear_memory()
+
+        return embeddings
 
     @classmethod
     def load(cls, path: str):
@@ -51,11 +61,13 @@ class Bert:
                 protocol=pickle.DEFAULT_PROTOCOL,
                 fix_imports=True)
 
+
 def infer_doc2vec(data: str, **kwargs) -> list:
     model = kwargs.get("model", None)
     return model.infer_vector(
-        data.split(" "), steps=35
+        data.split(" "), steps=35, alpha=0.025
     ) if model else None
+
 
 class BestCMeans:
     def fit_predict(self, data, c, m, error, maxiter, init=None, seed=None):

@@ -12,6 +12,7 @@ name = splitext(basename(__file__))[0]
 confidenceUser = 50
 documentPercentileInit = 20.0 * 2 ** (2*(1-confidenceUser/50.0))
 
+
 def model_path(dataset: str, id: int) -> str:
     return str(Path(
         f"./data/{dataset}/document/{name}/{id:03}.bin"
@@ -33,15 +34,14 @@ def train_model(dataset: str, id: int, corpus: Iterable[str]):
     model = BagOfWords()
     model.train(corpus=corpus)
     save_model(dataset=dataset, id=id, model=model)
-    
 
 
-def get_vectors(dataset: str, id: int, data: Iterable[str]) -> Iterable[Iterable[float]]:
+def get_vectors(dataset: str,
+                id: int,
+                data: Iterable[str] = None) -> List[List[float]]:
     model = load_model(dataset=dataset, id=id)
-    if not model:
-        model = train_model(dataset=dataset, id=id, corpus=data)
 
-    return model.matrix.tolist()
+    return model.predict(data=data) if data else model.matrix.tolist()
 
 
 def cluster(dataset: str, id: int,

@@ -1,4 +1,6 @@
-from sklearn.feature_extraction.text import TfidfVectorizer
+from numpy.lib.function_base import vectorize
+from sklearn.feature_extraction.text import (
+    TfidfVectorizer, TfidfTransformer, CountVectorizer)
 from sklearn.preprocessing import LabelEncoder
 from dataclasses import dataclass
 from typing import List, Iterable
@@ -8,6 +10,7 @@ from enum import Enum
 import pandas as pd
 import numpy as np
 import pickle
+
 
 class ModelType(Enum):
     DOCUMENT = "document"
@@ -22,6 +25,7 @@ models = [
     {"name": "Word2Vec", "model_type": ModelType.WORD},
     {"name": "FastText", "model_type": ModelType.WORD}]
 
+
 @dataclass(init=False)
 class Data:
     name: str
@@ -33,15 +37,15 @@ class Data:
     k: int
 
     def __init__(self, data: pd.DataFrame,
-                       name: str,
-                       id_field: str,
-                       content_fields: List[str],
-                       label_field: str):
+                 name: str,
+                 label_field: str,
+                 content_fields: List[str],
+                 id_field: str = None):
         from utils.text import process_text
         from utils import batch_processing
 
         self.name = name
-        self.ids = data[id_field].tolist()
+        self.ids = [* (data[id_field] if id_field else range(len(data)))]
         self.content = data[content_fields].agg("\n".join, axis=1).tolist()
         self.labels = LabelEncoder().fit_transform(data[label_field]).tolist()
         self.n = len(data)
@@ -51,7 +55,7 @@ class Data:
             self.processed = batch_processing(fn=process_text, deep=True,
                                               data=[*self.content])
             sp.ok("✔ ")
-        
+
         self.save()
 
     def save(self):
@@ -113,6 +117,14 @@ class BagOfWords:
         self.matrix = np.array(self.matrix, dtype=np.float32)
         self.n, self.m = self.matrix.shape  # (N documents, M features)
         return self.matrix
+
+    def predict(self, data: Iterable[str]) -> List[List[float]]:
+        vectorizer = CountVectorizer(
+            vocabulary=self.vocabulary, encoding="utf-8")
+
+        return TfidfTransformer().fit_transform(
+            vectorizer.fit_transform(data)
+        ).toarray().tolist()
 
     def __getitem__(self, item) -> np.array:
         if isinstance(item, (int, slice)):
