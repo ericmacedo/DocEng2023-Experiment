@@ -160,9 +160,8 @@ with yaspin(text="Clustering", color="cyan") as sp:
 
             sp.write("> Running clustering algorithm {0} x {1}".format(
                 word_model_cfg['name'], doc_model_cfg['name']))
-            report = Report(name="_".join([data.name,
-                                          word_model_cfg['name'],
-                                          doc_model_cfg['name']]),
+            report = Report(name="_".join([word_model_cfg['name'],
+                                           doc_model_cfg['name']]),
                             dataset=data.name)
             for id in range(1, repeat):
                 sp.text = f"Clustering iteration {id}"

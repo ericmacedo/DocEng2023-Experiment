@@ -8,6 +8,7 @@ from pathlib import Path
 from utils import timing
 import pickle
 
+
 @dataclass
 class Evaluation:
     SILHOUETTE: Silhouette
@@ -23,13 +24,13 @@ class Evaluation:
                  labels_pred: List[int],
                  time: float):
         params = dict(X=X, labels_true=labels_true, labels_pred=labels_pred)
-        
+
         self.SILHOUETTE = Silhouette(**params)
-        self.AMI        = AMI(**params)
-        self.ARS        = ARS(**params)
-        self.FMS        = FMS(**params)
-        self.VMEASURE   = VMeasure(**params)
-        self.TIME       = Time(time=time)
+        self.AMI = AMI(**params)
+        self.ARS = ARS(**params)
+        self.FMS = FMS(**params)
+        self.VMEASURE = VMeasure(**params)
+        self.TIME = Time(time=time)
 
         self.__metrics = {
             Metrics.SILHOUETTE: self.SILHOUETTE,
@@ -38,10 +39,11 @@ class Evaluation:
             Metrics.FMS: self.FMS,
             Metrics.V: self.VMEASURE,
             Metrics.TIME: self.TIME}
-    
+
     def get(self, metric: Metrics) -> Metric:
         return self.__metrics.get(metric, None)
-    
+
+
 @dataclass
 class Clustering:
     id: int
@@ -50,7 +52,7 @@ class Clustering:
     labels_pred: List[int]
     metrics: Evaluation
 
-    def __init__(self, 
+    def __init__(self,
                  id: int,
                  X: Sequence[Sequence[float]],
                  labels_true: List[int],
@@ -73,7 +75,7 @@ class Clustering:
                 file=pkl_file,
                 protocol=pickle.DEFAULT_PROTOCOL,
                 fix_imports=True)
-                
+
     @classmethod
     def load(cls, folder: str, id: int):
         return pickle.load(open(f"{folder}/{id:03}.bin", "wb"))
@@ -85,14 +87,11 @@ class Report:
 
     def __init__(self, dataset: str, name: str):
         self.name = name
+        self.dataset = dataset
 
         self.__samples_path = f"./data/{dataset}/clustering/{name}"
-        
-        Path(self.__samples_path).resolve().mkdir(parents=True, exist_ok=True)
 
-    def __init__(self, name: str):
-        self.name = name
-        self.samples = []
+        Path(self.__samples_path).resolve().mkdir(parents=True, exist_ok=True)
 
     def append(self, clustering: Clustering):
         clustering.save(folder=self.__samples_path)
@@ -104,15 +103,23 @@ class Report:
             mean=mean(observations, axis=0),
             std=std(observations, axis=0))
 
+    def __len__(self) -> int:
+        files = Path(self.__samples_path).glob("*.bin")
+        return len([f for f in files if f.is_file()])
+
     def __getitem__(self, index: int) -> Clustering:
+        n = len(self)
         if isinstance(index, int):
+            if index > n:
+                raise IndexError
             return Clustering.load(folder=self.__samples_path, id=id)
         else:
             raise TypeError("Invalid index type")
 
-    def __len__(self) -> int:
-        files = Path(self.__samples_path).glob("*.bin")
-        return len([f for f in files if f.is_file()])
+    def __iter__(self):
+        n = len(self)
+        for index in range(n):
+            yield Clustering.load(folder=self.__samples_path, id=index)
 
     def save(self, folder: str):
         with open(f"{folder}/{self.name}.pkl", "wb") as f_pkl:
