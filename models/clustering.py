@@ -78,7 +78,7 @@ class Clustering:
 
     @classmethod
     def load(cls, folder: str, id: int):
-        return pickle.load(open(f"{folder}/{id:03}.bin", "wb"))
+        return pickle.load(open(f"{folder}/{id:03}.bin", "rb"))
 
 
 class Report:
