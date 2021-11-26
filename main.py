@@ -1,3 +1,4 @@
+from models import clustering
 from models.clustering import Report, Clustering, clusterer
 from utils import load_model, print_header, Logger
 from models.document import DocumentModels
@@ -115,7 +116,7 @@ with yaspin(color="cyan") as sp:
             f"> Traning {model_cfg['model_type'].value} model {model_cfg['name']}")
 
         model = load_model(**model_cfg)
-        for id in range(1, repeat):
+        for id in range(repeat):
             sp.text = f"Training model {id}"
             if id > 1 and model_cfg["name"] == "BagOfWords":
                 model.save_model(id=id,
@@ -163,8 +164,13 @@ with yaspin(text="Clustering", color="cyan") as sp:
             report = Report(name="_".join([word_model_cfg['name'],
                                            doc_model_cfg['name']]),
                             dataset=data.name)
-            for id in range(1, repeat):
+            for id in range(repeat):
                 sp.text = f"Clustering iteration {id}"
+                clustering_path = Path(f"{report.samples_path}/{id:03}.bin")
+
+                if clustering_path.exists():
+                    continue
+
                 embeddings = doc_model.get_vectors(id=id,
                                                    dataset=data.name,
                                                    data=data.processed)

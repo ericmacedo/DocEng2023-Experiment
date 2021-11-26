@@ -83,28 +83,30 @@ class Clustering:
 
 class Report:
     name: str
-    __samples_path: str
+    samples_path: str
 
     def __init__(self, dataset: str, name: str):
         self.name = name
-        self.dataset = dataset
 
-        self.__samples_path = f"./data/{dataset}/clustering/{name}"
+        self.samples_path = str(Path(
+            f"./data/{dataset}/clustering/{name}"
+        ).resolve())
 
-        Path(self.__samples_path).resolve().mkdir(parents=True, exist_ok=True)
+        Path(self.samples_path).mkdir(parents=True, exist_ok=True)
 
     def append(self, clustering: Clustering):
-        clustering.save(folder=self.__samples_path)
+        clustering.save(folder=self.samples_path)
         del clustering
 
     def get(self, metric: Metrics) -> str:
-        observations = [sample.metrics.get(metric=metric) for sample in self]
+        observations = [sample.metrics.get(metric=metric).measure
+                        for sample in self]
         return "{mean:.4f} ± {std:.4f}".format(
             mean=mean(observations, axis=0),
             std=std(observations, axis=0))
 
     def __len__(self) -> int:
-        files = Path(self.__samples_path).glob("*.bin")
+        files = Path(self.samples_path).glob("*.bin")
         return len([f for f in files if f.is_file()])
 
     def __getitem__(self, index: int) -> Clustering:
@@ -112,14 +114,14 @@ class Report:
         if isinstance(index, int):
             if index > n:
                 raise IndexError
-            return Clustering.load(folder=self.__samples_path, id=id)
+            return Clustering.load(folder=self.samples_path, id=id)
         else:
             raise TypeError("Invalid index type")
 
     def __iter__(self):
         n = len(self)
         for index in range(n):
-            yield Clustering.load(folder=self.__samples_path, id=index)
+            yield Clustering.load(folder=self.samples_path, id=index)
 
     def save(self, folder: str):
         with open(f"{folder}/{self.name}.pkl", "wb") as f_pkl:
